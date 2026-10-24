@@ -290,21 +290,21 @@ local IconIds = {
 
 -- Black palette with a purple accent.
 local Theme = {
-	backgroundTop = Color3.fromRGB(19, 19, 23),
-	backgroundBottom = Color3.fromRGB(10, 10, 12),
-	sidebar = Color3.fromRGB(14, 14, 17),
-	surface = Color3.fromRGB(23, 23, 28),
-	surfaceHover = Color3.fromRGB(29, 29, 35),
-	surfaceAlt = Color3.fromRGB(34, 34, 41),
+	backgroundTop = Color3.fromRGB(16, 16, 19),
+	backgroundBottom = Color3.fromRGB(12, 12, 14),
+	sidebar = Color3.fromRGB(14, 14, 16),
+	surface = Color3.fromRGB(21, 21, 25),
+	surfaceHover = Color3.fromRGB(26, 26, 31),
+	surfaceAlt = Color3.fromRGB(31, 31, 37),
 	track = Color3.fromRGB(44, 44, 52),
-	stroke = Color3.fromRGB(38, 38, 46),
-	strokeHover = Color3.fromRGB(74, 52, 104),
+	stroke = Color3.fromRGB(32, 32, 38),
+	strokeHover = Color3.fromRGB(50, 50, 58),
 	text = Color3.fromRGB(242, 242, 246),
 	subText = Color3.fromRGB(150, 150, 164),
 	mutedText = Color3.fromRGB(98, 98, 112),
 	knob = Color3.fromRGB(246, 246, 250),
-	accent = Color3.fromRGB(168, 85, 247),
-	accentSoft = Color3.fromRGB(38, 25, 56),
+	accent = Color3.fromRGB(139, 92, 246),
+	accentSoft = Color3.fromRGB(32, 26, 48),
 	accentDeep = Color3.fromRGB(118, 44, 214),
 	accentText = Color3.fromRGB(214, 178, 255),
 	flake = Color3.fromRGB(232, 234, 244),
@@ -848,7 +848,7 @@ local Elements = {}
 -- Every row shares this skeleton: icon tile, title, description and a right slot.
 function Elements.card(tab, options, rightWidth)
 	local hasDescription = type(options.Description) == "string" and options.Description ~= ""
-	local headerHeight = hasDescription and 56 or 44
+	local headerHeight = hasDescription and 52 or 40
 	rightWidth = rightWidth or 60
 
 	local card = Util.new("TextButton", {
@@ -859,7 +859,7 @@ function Elements.card(tab, options, rightWidth)
 		ClipsDescendants = true,
 		Parent = tab.page,
 	})
-	Util.corner(card, 10)
+	Util.corner(card, 8)
 	local stroke = Util.stroke(card, Theme.stroke)
 
 	local textInset = 14
@@ -869,12 +869,12 @@ function Elements.card(tab, options, rightWidth)
 		local tile = Util.new("Frame", {
 			Name = "IconTile",
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 12, 0, headerHeight / 2),
+			Position = UDim2.new(0, 10, 0, headerHeight / 2),
 			Size = UDim2.fromOffset(28, 28),
-			BackgroundColor3 = Theme.surfaceAlt,
+			BackgroundTransparency = 1,
 			Parent = card,
 		})
-		Util.corner(tile, 8)
+		Util.corner(tile, 6)
 
 		iconImage = Util.image(tile, options.Icon, 15, Theme.subText, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1827,26 +1827,26 @@ function Tab.new(window, config)
 	self.button = Util.new("TextButton", {
 		Name = self.name,
 		Text = "",
-		BackgroundColor3 = Theme.accentSoft,
+		BackgroundColor3 = Theme.surfaceAlt,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 36),
+		Size = UDim2.new(1, 0, 0, 34),
 		LayoutOrder = #window.tabs + 1,
 		Parent = window.tabList,
 	})
-	Util.corner(self.button, 9)
+	Util.corner(self.button, 7)
 
 	self.indicator = Util.new("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 0, 0.5, 0),
+		Position = UDim2.new(0, 4, 0.5, 0),
 		Size = UDim2.fromOffset(3, 0),
 		BackgroundColor3 = Theme.accent,
 		Parent = self.button,
 	})
 	Util.corner(self.indicator, 2)
 
-	self.iconImage = Util.image(self.button, self.icon, 17, Theme.mutedText, {
+	self.iconImage = Util.image(self.button, self.icon, 16, Theme.mutedText, {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 13, 0.5, 0),
+		Position = UDim2.new(0, 14, 0.5, 0),
 	})
 
 	self.label = Util.new("TextLabel", {
@@ -1876,7 +1876,7 @@ function Tab.new(window, config)
 
 	self.button.MouseEnter:Connect(function()
 		if not self.active then
-			Util.tween(self.button, Motion.quick, { BackgroundTransparency = 0, BackgroundColor3 = Theme.surfaceAlt })
+			Util.tween(self.button, Motion.quick, { BackgroundTransparency = 0.5, BackgroundColor3 = Theme.surfaceAlt })
 			Util.tween(self.label, Motion.quick, { TextColor3 = Theme.text })
 		end
 	end)
@@ -1908,11 +1908,11 @@ function Tab:SetActive(active)
 
 	Util.tween(self.button, Motion.quick, {
 		BackgroundTransparency = active and 0 or 1,
-		BackgroundColor3 = Theme.accentSoft,
+		BackgroundColor3 = Theme.surfaceAlt,
 	})
-	Util.tween(self.label, Motion.quick, { TextColor3 = active and Theme.accentText or Theme.subText })
+	Util.tween(self.label, Motion.quick, { TextColor3 = active and Theme.text or Theme.subText })
 	Util.tween(self.iconImage, Motion.quick, { ImageColor3 = active and Theme.accent or Theme.mutedText })
-	Util.tween(self.indicator, Motion.spring, { Size = UDim2.fromOffset(3, active and 18 or 0) })
+	Util.tween(self.indicator, Motion.spring, { Size = UDim2.fromOffset(3, active and 16 or 0) })
 end
 
 -- Hides everything that does not match; headers vanish while a query is active.
@@ -1981,7 +1981,7 @@ Window.__index = Window
 function Window.new(options)
 	local self = setmetatable({}, Window)
 	self.title = options.Title or "Moon Hub"
-	self.subTitle = options.SubTitle or "Snow Edition"
+	self.subTitle = options.SubTitle or ""
 	self.tabs = {}
 	self.flags = {}
 	self.connections = {}
@@ -2021,7 +2021,7 @@ function Window.new(options)
 		ZIndex = 1,
 		Parent = self.holder,
 	})
-	Util.corner(self.root, 14)
+	Util.corner(self.root, 12)
 	Util.stroke(self.root, Theme.stroke, 1)
 	Util.new("UIGradient", {
 		Color = ColorSequence.new(Theme.backgroundTop, Theme.backgroundBottom),
@@ -2030,7 +2030,7 @@ function Window.new(options)
 	})
 
 	self:buildSidebar()
-	if options.Snow ~= false then
+	if options.Snow == true then
 		self.snow = Snow.new(self.root, 3)
 	end
 	self:buildContent()
@@ -2057,7 +2057,7 @@ function Window:buildSidebar()
 		ZIndex = 2,
 		Parent = self.root,
 	})
-	Util.corner(sidebar, 14)
+	Util.corner(sidebar, 12)
 
 	-- Square off the right side so only the window corners stay rounded.
 	Util.new("Frame", {
@@ -2216,7 +2216,7 @@ function Window:buildContent()
 		BackgroundColor3 = Theme.accentSoft,
 		Parent = topbar,
 	})
-	Util.corner(tabTile, 10)
+	Util.corner(tabTile, 8)
 
 	self.topIcon = Util.image(tabTile, "layout-grid", 17, Theme.accent, {
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -2254,15 +2254,15 @@ function Window:buildContent()
 			Name = info.action,
 			Text = "",
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -16 - (index - 1) * 36, 0.5, 0),
-			Size = UDim2.fromOffset(30, 30),
-			BackgroundColor3 = Theme.surface,
+			Position = UDim2.new(1, -14 - (index - 1) * 32, 0.5, 0),
+			Size = UDim2.fromOffset(28, 28),
+			BackgroundColor3 = info.hover,
+			BackgroundTransparency = 1,
 			Parent = topbar,
 		})
-		Util.corner(button, 8)
-		local buttonStroke = Util.stroke(button, Theme.stroke)
+		Util.corner(button, 7)
 
-		local icon = Util.image(button, info.icon, 15, Theme.subText, {
+		local icon = Util.image(button, info.icon, 16, Theme.subText, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 		})
@@ -2271,13 +2271,11 @@ function Window:buildContent()
 		end
 
 		button.MouseEnter:Connect(function()
-			Util.tween(button, Motion.quick, { BackgroundColor3 = info.hover })
-			Util.tween(buttonStroke, Motion.quick, { Transparency = 1 })
+			Util.tween(button, Motion.quick, { BackgroundTransparency = 0 })
 			Util.tween(icon, Motion.quick, { ImageColor3 = info.tint })
 		end)
 		button.MouseLeave:Connect(function()
-			Util.tween(button, Motion.quick, { BackgroundColor3 = Theme.surface })
-			Util.tween(buttonStroke, Motion.quick, { Transparency = 0 })
+			Util.tween(button, Motion.quick, { BackgroundTransparency = 1 })
 			Util.tween(icon, Motion.quick, { ImageColor3 = Theme.subText })
 		end)
 
@@ -2295,7 +2293,7 @@ function Window:buildContent()
 	local search = Util.new("Frame", {
 		Name = "Search",
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -90, 0.5, 0),
+		Position = UDim2.new(1, -84, 0.5, 0),
 		Size = UDim2.fromOffset(170, 32),
 		BackgroundColor3 = Theme.surface,
 		Parent = topbar,
