@@ -47,7 +47,8 @@ local CONFIG_FOLDER = "MoonHub"
 local LOGO_URL = "https://raw.githubusercontent.com/okame7x/moon-hub/main/assets/logo.png"
 local LOGO_FILE = "logo_v1.png"
 local SHADOW_IMAGE = "rbxassetid://6014261993"
-local GOTHAM = "rbxasset://fonts/families/GothamSSm.json"
+local FREDOKA = "rbxasset://fonts/families/FredokaOne.json"
+local SOURCE_SANS = "rbxasset://fonts/families/SourceSansPro.json"
 
 -- Lucide icon ids (sourced from dawid-scripts/Fluent, Tarmac generated).
 local IconIds = {
@@ -289,41 +290,48 @@ local IconIds = {
 }
 
 -- Black palette with a purple accent.
+-- Palette taken from the game's own menus (SettingsMenu, Confirm, Code).
 local Theme = {
-	backgroundTop = Color3.fromRGB(16, 16, 19),
-	backgroundBottom = Color3.fromRGB(12, 12, 14),
-	sidebar = Color3.fromRGB(14, 14, 16),
-	surface = Color3.fromRGB(21, 21, 25),
-	surfaceHover = Color3.fromRGB(26, 26, 31),
-	surfaceAlt = Color3.fromRGB(31, 31, 37),
-	track = Color3.fromRGB(44, 44, 52),
-	stroke = Color3.fromRGB(32, 32, 38),
-	strokeHover = Color3.fromRGB(50, 50, 58),
-	text = Color3.fromRGB(242, 242, 246),
-	subText = Color3.fromRGB(150, 150, 164),
-	mutedText = Color3.fromRGB(98, 98, 112),
-	knob = Color3.fromRGB(246, 246, 250),
-	accent = Color3.fromRGB(139, 92, 246),
-	accentSoft = Color3.fromRGB(32, 26, 48),
-	accentDeep = Color3.fromRGB(118, 44, 214),
-	accentText = Color3.fromRGB(214, 178, 255),
+	backgroundTop = Color3.fromRGB(26, 26, 26),
+	backgroundBottom = Color3.fromRGB(20, 20, 20),
+	sidebar = Color3.fromRGB(17, 17, 17),
+	surface = Color3.fromRGB(34, 34, 34),
+	surfaceHover = Color3.fromRGB(43, 43, 43),
+	surfaceAlt = Color3.fromRGB(47, 47, 47),
+	track = Color3.fromRGB(70, 70, 70),
+	stroke = Color3.fromRGB(0, 0, 0),
+	strokeHover = Color3.fromRGB(255, 214, 49),
+	text = Color3.fromRGB(255, 255, 255),
+	subText = Color3.fromRGB(179, 179, 179),
+	mutedText = Color3.fromRGB(120, 120, 120),
+	darkText = Color3.fromRGB(0, 0, 0),
+	knob = Color3.fromRGB(255, 255, 255),
+	accent = Color3.fromRGB(255, 214, 49),
+	accentLight = Color3.fromRGB(255, 241, 87),
+	accentSoft = Color3.fromRGB(58, 50, 18),
+	accentDeep = Color3.fromRGB(232, 170, 20),
+	accentText = Color3.fromRGB(255, 241, 87),
+	titleTop = Color3.fromRGB(255, 255, 255),
+	titleBottom = Color3.fromRGB(196, 196, 196),
 	flake = Color3.fromRGB(232, 234, 244),
 	shadow = Color3.fromRGB(0, 0, 0),
-	success = Color3.fromRGB(52, 211, 153),
-	successSoft = Color3.fromRGB(18, 40, 32),
-	warning = Color3.fromRGB(251, 191, 36),
-	warningSoft = Color3.fromRGB(44, 35, 16),
-	danger = Color3.fromRGB(248, 113, 113),
-	dangerSoft = Color3.fromRGB(46, 20, 22),
-	logoTile = Color3.fromRGB(6, 6, 8),
-	logoEdge = Color3.fromRGB(48, 48, 58),
+	success = Color3.fromRGB(50, 185, 65),
+	successLight = Color3.fromRGB(76, 214, 90),
+	successSoft = Color3.fromRGB(20, 48, 24),
+	warning = Color3.fromRGB(255, 214, 49),
+	warningSoft = Color3.fromRGB(58, 50, 18),
+	danger = Color3.fromRGB(255, 79, 79),
+	dangerLight = Color3.fromRGB(255, 125, 125),
+	dangerSoft = Color3.fromRGB(56, 22, 22),
+	logoTile = Color3.fromRGB(10, 10, 10),
+	logoEdge = Color3.fromRGB(0, 0, 0),
 }
 
 local Fonts = {
-	regular = Font.new(GOTHAM, Enum.FontWeight.Regular),
-	medium = Font.new(GOTHAM, Enum.FontWeight.Medium),
-	semibold = Font.new(GOTHAM, Enum.FontWeight.SemiBold),
-	bold = Font.new(GOTHAM, Enum.FontWeight.Bold),
+	regular = Font.new(SOURCE_SANS, Enum.FontWeight.SemiBold),
+	medium = Font.new(FREDOKA, Enum.FontWeight.Regular),
+	semibold = Font.new(FREDOKA, Enum.FontWeight.Regular),
+	bold = Font.new(FREDOKA, Enum.FontWeight.Regular),
 }
 
 local Motion = {
@@ -380,6 +388,16 @@ function Util.new(className, properties, children)
 		child.Parent = object
 	end
 
+	-- Blox Fruits outlines every label in black.
+	if object:IsA("TextLabel") or object:IsA("TextBox") then
+		local outline = Instance.new("UIStroke")
+		outline.Thickness = 1
+		outline.Transparency = 0.2
+		outline.Color = Theme.stroke
+		outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+		outline.Parent = object
+	end
+
 	return object
 end
 
@@ -387,10 +405,24 @@ function Util.corner(parent, radius)
 	return Util.new("UICorner", { CornerRadius = UDim.new(0, radius or 8), Parent = parent })
 end
 
+-- Lighter strip over the top 40%, the bevel the game puts on its buttons.
+function Util.bevel(parent, color, radius)
+	local strip = Util.new("Frame", {
+		Name = "Trans",
+		Position = UDim2.fromOffset(2, 2),
+		Size = UDim2.new(1, -4, 0.4, 0),
+		BackgroundColor3 = color,
+		ZIndex = parent.ZIndex,
+		Parent = parent,
+	})
+	Util.corner(strip, radius or 6)
+	return strip
+end
+
 function Util.stroke(parent, color, thickness, transparency)
 	return Util.new("UIStroke", {
 		Color = color or Theme.stroke,
-		Thickness = thickness or 1,
+		Thickness = thickness or 2,
 		Transparency = transparency or 0,
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Parent = parent,
@@ -510,7 +542,7 @@ function Util.image(parent, iconName, size, color, properties)
 end
 
 function Util.textWidth(text, size)
-	return textService:GetTextSize(text, size, Enum.Font.GothamBold, Vector2.new(2000, 100)).X
+	return textService:GetTextSize(text, size, Enum.Font.FredokaOne, Vector2.new(2000, 100)).X
 end
 
 -- Callbacks never break the UI; errors are reported instead.
@@ -1113,6 +1145,7 @@ function Elements.toggle(tab, options)
 		Parent = card,
 	})
 	Util.corner(track, 11)
+	Util.stroke(track, Theme.stroke, 2)
 
 	local knob = Util.new("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
@@ -1122,13 +1155,13 @@ function Elements.toggle(tab, options)
 		Parent = track,
 	})
 	Util.corner(knob, 8)
-	Util.stroke(knob, Theme.shadow, 1, 0.88)
+	Util.stroke(knob, Theme.stroke, 2)
 
 	local control = { instance = card, value = false }
 
 	function control:Set(state, silent)
 		self.value = state == true
-		Util.tween(track, Motion.quick, { BackgroundColor3 = self.value and Theme.accent or Theme.track })
+		Util.tween(track, Motion.quick, { BackgroundColor3 = self.value and Theme.success or Theme.track })
 		Util.tween(knob, Motion.spring, {
 			Position = self.value and UDim2.new(1, -19, 0.5, 0) or UDim2.new(0, 3, 0.5, 0),
 		})
@@ -1176,6 +1209,7 @@ function Elements.slider(tab, options)
 		Parent = card,
 	})
 	Util.corner(track, 3)
+	Util.stroke(track, Theme.stroke, 2)
 
 	local fill = Util.new("Frame", {
 		Size = UDim2.fromScale(0, 1),
@@ -1196,7 +1230,7 @@ function Elements.slider(tab, options)
 		Parent = track,
 	})
 	Util.corner(knob, 7)
-	Util.stroke(knob, Theme.accent, 2)
+	Util.stroke(knob, Theme.stroke, 2)
 
 	local control = { instance = card, value = minimum }
 
@@ -1835,14 +1869,10 @@ function Tab.new(window, config)
 	})
 	Util.corner(self.button, 7)
 
-	self.indicator = Util.new("Frame", {
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 4, 0.5, 0),
-		Size = UDim2.fromOffset(3, 0),
-		BackgroundColor3 = Theme.accent,
-		Parent = self.button,
-	})
-	Util.corner(self.indicator, 2)
+	-- Active tab turns into a yellow game button: outline plus top bevel.
+	self.stroke = Util.stroke(self.button, Theme.stroke, 2, 1)
+	self.indicator = Util.bevel(self.button, Theme.accentLight, 5)
+	self.indicator.BackgroundTransparency = 1
 
 	self.iconImage = Util.image(self.button, self.icon, 16, Theme.mutedText, {
 		AnchorPoint = Vector2.new(0, 0.5),
@@ -1876,7 +1906,7 @@ function Tab.new(window, config)
 
 	self.button.MouseEnter:Connect(function()
 		if not self.active then
-			Util.tween(self.button, Motion.quick, { BackgroundTransparency = 0.5, BackgroundColor3 = Theme.surfaceAlt })
+			Util.tween(self.button, Motion.quick, { BackgroundTransparency = 0, BackgroundColor3 = Theme.surfaceAlt })
 			Util.tween(self.label, Motion.quick, { TextColor3 = Theme.text })
 		end
 	end)
@@ -1904,15 +1934,15 @@ end
 function Tab:SetActive(active)
 	self.active = active
 	self.page.Visible = active
-	self.label.FontFace = active and Fonts.semibold or Fonts.medium
 
 	Util.tween(self.button, Motion.quick, {
 		BackgroundTransparency = active and 0 or 1,
-		BackgroundColor3 = Theme.surfaceAlt,
+		BackgroundColor3 = active and Theme.accent or Theme.surfaceAlt,
 	})
-	Util.tween(self.label, Motion.quick, { TextColor3 = active and Theme.text or Theme.subText })
-	Util.tween(self.iconImage, Motion.quick, { ImageColor3 = active and Theme.accent or Theme.mutedText })
-	Util.tween(self.indicator, Motion.spring, { Size = UDim2.fromOffset(3, active and 16 or 0) })
+	Util.tween(self.stroke, Motion.quick, { Transparency = active and 0 or 1 })
+	Util.tween(self.indicator, Motion.quick, { BackgroundTransparency = active and 0 or 1 })
+	Util.tween(self.label, Motion.quick, { TextColor3 = active and Theme.darkText or Theme.subText })
+	Util.tween(self.iconImage, Motion.quick, { ImageColor3 = active and Theme.darkText or Theme.mutedText })
 end
 
 -- Hides everything that does not match; headers vanish while a query is active.
@@ -2022,7 +2052,7 @@ function Window.new(options)
 		Parent = self.holder,
 	})
 	Util.corner(self.root, 12)
-	Util.stroke(self.root, Theme.stroke, 1)
+	Util.stroke(self.root, Theme.stroke, 3)
 	Util.new("UIGradient", {
 		Color = ColorSequence.new(Theme.backgroundTop, Theme.backgroundBottom),
 		Rotation = 90,
@@ -2129,7 +2159,8 @@ function Window:buildSidebar()
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 		Parent = sidebar,
 	})
-	Util.list(self.tabList, 4)
+	Util.list(self.tabList, 5)
+	Util.padding(self.tabList, 2, 2, 2, 2)
 
 	-- Profile card with the player's headshot.
 	self.expandedOnly.tabList = self.tabList
@@ -2202,67 +2233,82 @@ function Window:buildContent()
 	})
 	self.content = content
 
+	-- White title bar with a soft gradient and black outline, like the game's menus.
 	local topbar = Util.new("Frame", {
 		Name = "Topbar",
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, TOPBAR_HEIGHT),
+		Position = UDim2.fromOffset(10, 9),
+		Size = UDim2.new(1, -20, 0, TOPBAR_HEIGHT - 16),
+		BackgroundColor3 = Color3.new(1, 1, 1),
 		Parent = content,
+	})
+	Util.corner(topbar, 8)
+	Util.stroke(topbar, Theme.stroke, 2)
+	Util.new("UIGradient", {
+		Color = ColorSequence.new(Theme.titleTop, Theme.titleBottom),
+		Rotation = 90,
+		Parent = topbar,
 	})
 
 	local tabTile = Util.new("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 18, 0.5, 0),
-		Size = UDim2.fromOffset(34, 34),
-		BackgroundColor3 = Theme.accentSoft,
+		Position = UDim2.new(0, 8, 0.5, 0),
+		Size = UDim2.fromOffset(32, 32),
+		BackgroundColor3 = Theme.accent,
 		Parent = topbar,
 	})
-	Util.corner(tabTile, 8)
+	Util.corner(tabTile, 7)
+	Util.stroke(tabTile, Theme.stroke, 2)
+	Util.bevel(tabTile, Theme.accentLight, 5)
 
-	self.topIcon = Util.image(tabTile, "layout-grid", 17, Theme.accent, {
+	self.topIcon = Util.image(tabTile, "layout-grid", 17, Theme.darkText, {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
 	})
 
 	self.topTitle = Util.new("TextLabel", {
-		Position = UDim2.new(0, 62, 0, 13),
-		Size = UDim2.new(1, -330, 0, 20),
+		Position = UDim2.new(0, 50, 0, 5),
+		Size = UDim2.new(1, -320, 0, 20),
 		Text = "",
-		TextSize = 17,
+		TextColor3 = Theme.darkText,
+		TextSize = 18,
 		FontFace = Fonts.bold,
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = topbar,
 	})
+	self.topTitle.UIStroke.Enabled = false
 
 	self.topDescription = Util.new("TextLabel", {
-		Position = UDim2.new(0, 62, 0, 34),
-		Size = UDim2.new(1, -330, 0, 14),
+		Position = UDim2.new(0, 50, 0, 25),
+		Size = UDim2.new(1, -320, 0, 14),
 		Text = "",
-		TextColor3 = Theme.subText,
-		TextSize = 11,
+		TextColor3 = Color3.fromRGB(70, 70, 70),
+		TextSize = 13,
 		FontFace = Fonts.regular,
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = topbar,
 	})
+	self.topDescription.UIStroke.Enabled = false
 
-	-- Window buttons.
+	-- Window buttons: red close and grey minimize, both with the game's bevel.
 	local buttons = {
-		{ icon = "x", action = "close", hover = Theme.dangerSoft, tint = Theme.danger },
-		{ icon = "minus", action = "minimize", hover = Theme.surfaceAlt, tint = Theme.text },
+		{ icon = "x", action = "close", color = Theme.danger, light = Theme.dangerLight },
+		{ icon = "minus", action = "minimize", color = Theme.track, light = Color3.fromRGB(105, 105, 105) },
 	}
 	for index, info in ipairs(buttons) do
 		local button = Util.new("TextButton", {
 			Name = info.action,
 			Text = "",
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -14 - (index - 1) * 32, 0.5, 0),
-			Size = UDim2.fromOffset(28, 28),
-			BackgroundColor3 = info.hover,
-			BackgroundTransparency = 1,
+			Position = UDim2.new(1, -8 - (index - 1) * 36, 0.5, 0),
+			Size = UDim2.fromOffset(30, 30),
+			BackgroundColor3 = info.color,
 			Parent = topbar,
 		})
 		Util.corner(button, 7)
+		Util.stroke(button, Theme.stroke, 2)
+		Util.bevel(button, info.light, 5)
 
-		local icon = Util.image(button, info.icon, 16, Theme.subText, {
+		local icon = Util.image(button, info.icon, 18, Theme.text, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 		})
@@ -2270,13 +2316,12 @@ function Window:buildContent()
 			self.minimizeIcon = icon
 		end
 
+		local scale = Util.new("UIScale", { Parent = button })
 		button.MouseEnter:Connect(function()
-			Util.tween(button, Motion.quick, { BackgroundTransparency = 0 })
-			Util.tween(icon, Motion.quick, { ImageColor3 = info.tint })
+			Util.tween(scale, Motion.quick, { Scale = 1.08 })
 		end)
 		button.MouseLeave:Connect(function()
-			Util.tween(button, Motion.quick, { BackgroundTransparency = 1 })
-			Util.tween(icon, Motion.quick, { ImageColor3 = Theme.subText })
+			Util.tween(scale, Motion.quick, { Scale = 1 })
 		end)
 
 		button.MouseButton1Click:Connect(function()
@@ -2294,7 +2339,7 @@ function Window:buildContent()
 		Name = "Search",
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -84, 0.5, 0),
-		Size = UDim2.fromOffset(170, 32),
+		Size = UDim2.fromOffset(170, 30),
 		BackgroundColor3 = Theme.surface,
 		Parent = topbar,
 	})
@@ -2333,6 +2378,7 @@ function Window:buildContent()
 		Position = UDim2.new(0, 18, 0, TOPBAR_HEIGHT),
 		Size = UDim2.new(1, -36, 0, 1),
 		BackgroundColor3 = Theme.stroke,
+		BackgroundTransparency = 1,
 		Parent = content,
 	})
 	Util.new("UIGradient", {
