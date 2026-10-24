@@ -2283,7 +2283,8 @@ function Window:buildContent()
 
 		button.MouseButton1Click:Connect(function()
 			if info.action == "close" then
-				self:Destroy()
+				-- Close only hides the window; the floating pill stays to reopen it.
+				self:SetVisible(false)
 			else
 				self:SetMinimized(not self.minimized)
 			end
